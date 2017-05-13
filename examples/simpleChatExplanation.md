@@ -1,0 +1,3 @@
+1. Queremos fazer um programa que seja possível entrar em um "chat global" conversar com os usuários que estão conectados ao server.
+2. Faz sentido que cada usuário tenha um "login" para que todos possam saber seu nome no chat. Então, vamos definir que quando um usuário se conecta ao servidor, sua primeira mensagem deve ser seu login escolhido.
+3. Em seguida, todas as mensagens enviadas por um cliente é enviada para todos usuários concetados no chat.
