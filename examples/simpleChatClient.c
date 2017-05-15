@@ -9,7 +9,11 @@
 #define HIST_MAX_SIZE 200
 
 int main(){
-	connectToServer(NULL);
+	char ServerIP[30];
+	printf("Digite o IP do server: ");
+	scanf("%s", ServerIP);	
+	getchar();
+	connectToServer(ServerIP);
 	char str_buffer[BUFFER_SIZE], type_buffer[MSG_MAX_SIZE] = {0};
 	char msg_history[HIST_MAX_SIZE][MSG_MAX_SIZE] = {{0}};
 	int type_pointer = 0;

@@ -13,7 +13,7 @@
 #include <arpa/inet.h>
 #include <errno.h>
 
-#define PORT 9004
+#define PORT 9005
 #define TOO_MANY_CLIENTS 1
 #define SUCCESSFUL_CONNECTION 2
 #define SELECT_TIMEOUT 300
