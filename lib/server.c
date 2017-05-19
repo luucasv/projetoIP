@@ -14,6 +14,11 @@ fd_set server_fd_set, active_fd_set;
 int server_sock; // server socket id
 
 
+struct msg_ret_t make_msg_ret(int status, int client_id, int quant_bytes){
+	struct msg_ret_t ret = {status, client_id, quant_bytes};
+	return ret;
+}
+
 
 // Make socket for the server
 int makeSocket(){
@@ -37,7 +42,7 @@ int makeSocket(){
       	exit (EXIT_FAILURE);
     }
 
-    // As the server doesn't uses threads, we need to make the "read" method not preemptive 
+    // As the server doesn't uses threads, we need to make the "read" method not preemptive
 	// So it's making the read and the accept call not to stop the program and return "some defined message" when nothing is buffered
 
   	return sock;
@@ -49,7 +54,7 @@ void serverInit(int max_clients){
 		puts("max_clients is invalid!");
 		exit(EXIT_FAILURE);
 	}
-	
+
 	actual_max_clients = max_clients;
 	server_sock = makeSocket();
 
@@ -94,7 +99,7 @@ int acceptConnection(){
 	int new_sock = accept(server_sock, NULL, NULL);
 	int return_msg;
 
-	
+
 	if(new_sock < 0){ // not valid sock value
 		puts("Could not create new socket for new connection");
         exit(EXIT_FAILURE);
@@ -127,7 +132,7 @@ Return:
 	otherwise returns the ID of the client who sent the message
 */
 
-int recvMsg(void * msg){
+struct msg_ret_t recvMsg(void * msg){
 	struct timeval timeout = {0, SELECT_TIMEOUT};
 	fd_set readfds = active_fd_set;
 	int sel_ret = select(FD_SETSIZE, &readfds, NULL, NULL, &timeout);
@@ -136,18 +141,17 @@ int recvMsg(void * msg){
         exit (EXIT_FAILURE);
    	}
    	if(sel_ret == 0){ // timeout
-		return NO_MESSAGE;
+		return make_msg_ret(NO_MESSAGE, -1, 0);
 	}
 	int i;
 	for(i = 0; i < actual_max_clients; ++i){ // look for someone with valid sockid
 		if(connected_clients[i].sockid != 0){
 			if(FD_ISSET(connected_clients[i].sockid, &readfds)){
-				recvMsgFromClient(msg, i, WAIT_FOR_IT);
-				return i;
+				return recvMsgFromClient(msg, i, WAIT_FOR_IT);
 			}
 		}
 	}
-	return NO_MESSAGE;
+	return make_msg_ret(NO_MESSAGE, -1, 0);
 }
 
 /*
@@ -157,9 +161,9 @@ Return:
 	If there is no message, returns NO_MESSAGE
 	otherwise returns the received message size in bytes
 */
-int recvMsgFromClient(void *msg, int client_id, int option){
+struct msg_ret_t recvMsgFromClient(void *msg, int client_id, int option){
 	if(connected_clients[client_id].sockid == 0){
-		return NOT_VALID_CLIENT_ID;
+		return make_msg_ret(NOT_VALID_CLIENT_ID, -1, 0);
 	}
 	if(option == DONT_WAIT){
 		struct timeval timeout = {0, SELECT_TIMEOUT};
@@ -170,25 +174,25 @@ int recvMsgFromClient(void *msg, int client_id, int option){
 	        exit (EXIT_FAILURE);
 	   	}
 	   	if(sel_ret == 0 || !FD_ISSET(connected_clients[client_id].sockid, &readfds)){ // timeout
-			return NO_MESSAGE;
+			return make_msg_ret(NO_MESSAGE, -1, 0);
 		}
 	}
 	// either we have to wait, or there is nothing to wait
-	int size;
+	int msg_size;
 	int size_ret, msg_ret;
 	// get message size
-	size_ret = read(connected_clients[client_id].sockid, &size, sizeof(int));
-	if(size_ret < 0){
+	size_ret = read(connected_clients[client_id].sockid, &msg_size, sizeof(int));
+	if(size_ret <= 0){
 		disconnectClient(client_id);
-		return NO_MESSAGE;
+		return make_msg_ret(DISCONNECT_MSG, client_id, 0);
 	}
 	// get message content
-	msg_ret = read(connected_clients[client_id].sockid, msg, size);
-	if(msg_ret < 0){
+	msg_ret = read(connected_clients[client_id].sockid, msg, msg_size);
+	if(msg_ret <= 0){
 		disconnectClient(client_id);
-		return NO_MESSAGE;
+		return make_msg_ret(DISCONNECT_MSG, client_id, 0);
 	}
-	return msg_ret;
+	return make_msg_ret(MESSAGE_OK, client_id, msg_ret);
 }
 
 /*

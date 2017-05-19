@@ -7,6 +7,10 @@
 int network_socket;
 fd_set sock_fd_set;
 
+/*
+	Connects to server with IP informed as string on standard format (X.X.X.X)
+	If ServerIP is NULL connects to localhost (good to debug)
+*/
 void connectToServer(const char *server_IP){
 	// create a socket for the client
 	network_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -49,15 +53,16 @@ void connectToServer(const char *server_IP){
 	FD_SET (network_socket, &sock_fd_set);
 }
 
+
 int sendMsgToServer(void *msg, int size){
 	int size_ret = write(network_socket, &size, sizeof(int));
 	if(size_ret < 0){
-		puts("Failed to send message");
+		perror("Failed to send message");
 		exit(EXIT_FAILURE);
 	}
 	int msg_ret = write(network_socket, msg, size);
 	if(msg_ret < 0){
-		puts("Failed to send message");
+		perror("Failed to send message");
 		exit(EXIT_FAILURE);
 	}
 	return msg_ret;
@@ -96,7 +101,7 @@ char getch(){
     int ch;
     struct pollfd mypoll = { STDIN_FILENO, POLLIN|POLLPRI };
     tcgetattr(STDIN_FILENO, &oldt); // saving old config in oldt
-  
+
     newt = oldt;
     newt.c_lflag &= ~(ICANON | ECHO);
 
@@ -108,7 +113,7 @@ char getch(){
 	else{
 		ch = NO_KEY_PRESSED;
 	}
-	
+
 	tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
     return ch;
 }

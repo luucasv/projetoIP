@@ -8,25 +8,38 @@
 #define LOGIN_MAX_SIZE 13
 #define HIST_MAX_SIZE 200
 
+void clear_buffer(){
+	char aux_ch;
+	while(aux_ch = getch(), aux_ch == ' ' || aux_ch == '\n');
+}
+
 int main(){
 	char ServerIP[30];
-	printf("Digite o IP do server: ");
-	scanf("%s", ServerIP);	
-	getchar();
-	connectToServer(ServerIP);
+	printf("Please enter the server IP: ");
+	scanf("%s", ServerIP);
 	char str_buffer[BUFFER_SIZE], type_buffer[MSG_MAX_SIZE] = {0};
 	char msg_history[HIST_MAX_SIZE][MSG_MAX_SIZE] = {{0}};
 	int type_pointer = 0;
-
-	printf("Digite o seu login desejado (limite = %d): ", LOGIN_MAX_SIZE);
-	fgets(str_buffer, LOGIN_MAX_SIZE, stdin);
+	printf("Please enter your login (limit = %d): ", LOGIN_MAX_SIZE);
+	getchar();
+	fgets(str_buffer, LOGIN_MAX_SIZE + 1, stdin);
 	int len = strlen(str_buffer) - 1;
-	str_buffer[len] = '\0'; // chaging \n por \0
+	str_buffer[len] = '\0'; // chaging \n to \0
+
+	if(str_buffer[0] == '\0'){
+		connectToServer(NULL);
+	}
+	else{
+		connectToServer(ServerIP);
+	}
 	sendMsgToServer((void *) str_buffer, len + 1); // size includes \0
 
+	// clear_buffer();
 
 	puts("Welcome to the chat example");
 	puts("Just type your messages e talk to your freinds");
+	puts("Press [Enter] to continue");
+	getchar();
 	while(1){
 		//// LER UMA TECLA DIGITADA
 		char ch = getch();
@@ -63,7 +76,7 @@ int main(){
 		for(i = 0; i < HIST_MAX_SIZE; ++i){
 			printf("%s\n", msg_history[i]);
 		}
-		printf("\nSua mensagem: %s\n", type_buffer);
+		printf("\nYour message: %s\n", type_buffer);
 
 	}
 	return 0;
