@@ -14,9 +14,9 @@ Como dito anteriormente, o projeto vai se basear na arquitetura cliente-servidor
 
 ## Compilando e rodando:
 
-No arquivo do [makefile](https://github.com/luucasv/projetoIP/blob/master/makefile) as variáves _serverName_ e _clientName_ devem ser substituidas para o nome do arquivo do código do servidor e cliente que deseja compilar e/ou executar.  
+No arquivo do [makefile](./makefile) as variáves _serverName_ e _clientName_ devem ser substituidas para o nome do arquivo do código do servidor e cliente que deseja compilar e/ou executar.  
 #### Compilando e rodando o server:
-	$ make server 
+	$ make server
 #### Compiando e rodando o client:
 	$ make client
 #### Compilando client e server:
@@ -25,7 +25,7 @@ No arquivo do [makefile](https://github.com/luucasv/projetoIP/blob/master/makefi
 
 ## Exemplos:
 Idealmente alguns exemplos de uso da biblioteca serão colocados na pasta de exemplos.
-* [Simple Chat](https://github.com/luucasv/projetoIP/blob/master/examples/simpleChatExplanation.md)
+* [Simple Chat](./examples/simpleChatExplanation.md)
 
 
 ## Agradecimentos:

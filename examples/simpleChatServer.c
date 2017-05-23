@@ -11,6 +11,7 @@ int main(){
 	char client_names[MAX_CHAT_CLIENTS][LOGIN_MAX_SIZE];
 	char str_buffer[BUFFER_SIZE], aux_buffer[BUFFER_SIZE];
 	serverInit(MAX_CHAT_CLIENTS);
+	puts("Server is running!!");
 	while(1){
 		int id = acceptConnection();
 		if(id != NO_CONNECTION){

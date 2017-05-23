@@ -27,7 +27,7 @@ int makeSocket(){
 
   	sock = socket (AF_INET, SOCK_STREAM, 0);
   	if (sock < 0){
-		puts("Could not create socket");
+		perror("Could not create socket");
     	exit (EXIT_FAILURE);
   	}
 
@@ -38,7 +38,7 @@ int makeSocket(){
   	name.sin_addr.s_addr = htonl (INADDR_ANY);
   	int bind_ret = bind (sock, (struct sockaddr *) &name, sizeof (name));
   	if(bind_ret < 0){
-    	puts("Server could not bind!");
+    	perror("Server could not bind!");
       	exit (EXIT_FAILURE);
     }
 
@@ -51,7 +51,7 @@ int makeSocket(){
 // Set everything nedded for the server
 void serverInit(int max_clients){
 	if(max_clients <= 0 || max_clients >= MAX_CLIENTS){
-		puts("max_clients is invalid!");
+		perror("max_clients is invalid!");
 		exit(EXIT_FAILURE);
 	}
 
@@ -69,6 +69,7 @@ void serverInit(int max_clients){
 	serverReset();
 }
 
+// If needed to clean everything
 void serverReset(){
 	memset(connected_clients, 0, sizeof connected_clients);
 	clients_connected = 0;
@@ -81,7 +82,8 @@ void serverReset(){
 If there is a connection pedding, accept it.
 Returns:
 	NO_CONNECTION if there is no connection or failed (too many clients)
-	otherwise returns a id to the new user (this id has to be used in other used when message is needed to be set to specific client)
+	otherwise returns a id to the new user (this id has to be used when a message is needed to be sent to a specific client)
+	0 <= id < max_clients (no of clients set in "serverInit")
 */
 int acceptConnection(){
 	struct timeval timeout = {0, SELECT_TIMEOUT};
@@ -101,7 +103,7 @@ int acceptConnection(){
 
 
 	if(new_sock < 0){ // not valid sock value
-		puts("Could not create new socket for new connection");
+		perror("Could not create new socket for new connection");
         exit(EXIT_FAILURE);
 	}
 	if(clients_connected == actual_max_clients){ // there are too many clients connected
@@ -128,8 +130,9 @@ int acceptConnection(){
 /*
 Receive a padding message from cleints
 Return:
-	If there is no message, returns NO_MESSAGE
-	otherwise returns the ID of the client who sent the message
+	If there is no message, return.status is NO_MESSAGE
+	If the user sent a message to disconect, return.status is DISCONNECT_MSG and return.client_id is the user's id (the user is automatically disconected )
+	otherwise return.status is MESSAGE_OK , return.client_id  is the user's id and return.quant_bytes is the size of the messagem in bytes
 */
 
 struct msg_ret_t recvMsg(void * msg){
@@ -145,7 +148,7 @@ struct msg_ret_t recvMsg(void * msg){
 	}
 	int i;
 	for(i = 0; i < actual_max_clients; ++i){ // look for someone with valid sockid
-		if(connected_clients[i].sockid != 0){
+		if(isValidId(i)){
 			if(FD_ISSET(connected_clients[i].sockid, &readfds)){
 				return recvMsgFromClient(msg, i, WAIT_FOR_IT);
 			}
@@ -157,12 +160,13 @@ struct msg_ret_t recvMsg(void * msg){
 /*
 Receive a padding message from cleint with id equals to client_id
 Return:
-	If client_id is not a valid one, returns NOT_VALID_CLIENT_ID
-	If there is no message, returns NO_MESSAGE
+	If client_id is not a valid one, return.status is NOT_VALID_CLIENT_ID
+	If there is no message in buffer and option is DONT_WAIT, return.status is NO_MESSAGE
+	If there is no message in buffer and option is WAIT_FOR_IT, the function waits untill the user sends a message
 	otherwise returns the received message size in bytes
 */
 struct msg_ret_t recvMsgFromClient(void *msg, int client_id, int option){
-	if(connected_clients[client_id].sockid == 0){
+	if(!isValidId(client_id)){
 		return make_msg_ret(NOT_VALID_CLIENT_ID, -1, 0);
 	}
 	if(option == DONT_WAIT){
@@ -203,17 +207,17 @@ Return:
 	If error, stop program
 */
 int sendMsgToClient(void *msg, int size, int client_id){
-	if(connected_clients[client_id].sockid == 0){
+	if(!isValidId(client_id)){
 		return NOT_VALID_CLIENT_ID;
 	}
 	int size_ret = write(connected_clients[client_id].sockid, &size, sizeof(int));
 	if(size_ret < 0){
-		puts("Failed to send message to client");
+		perror("Failed to send message to client");
 		exit(EXIT_FAILURE);
 	}
 	int msg_ret = write(connected_clients[client_id].sockid, msg, size);
 	if(msg_ret < 0){
-		puts("Failed to send message");
+		perror("Failed to send message");
 		exit(EXIT_FAILURE);
 	}
 	return msg_ret;
@@ -227,15 +231,22 @@ Return:
 void broadcast(void *msg, int size){
 	int i;
 	for(i = 0; i < actual_max_clients; ++i){
-		if(connected_clients[i].sockid != 0){
+		if(isValidId(i)){
 			sendMsgToClient(msg, size, i);
 		}
 	}
 }
 
 void disconnectClient(int client_id){
+	if(!isValidId(client_id)){
+		return;
+	}
 	close(connected_clients[client_id].sockid);
 	FD_CLR (connected_clients[client_id].sockid, &active_fd_set);
 	connected_clients[client_id].sockid = 0;
 	--clients_connected;
+}
+
+int isValidId(int client_id){
+	return connected_clients[client_id].sockid != 0;
 }

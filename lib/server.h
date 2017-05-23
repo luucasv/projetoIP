@@ -24,5 +24,6 @@ struct msg_ret_t recvMsgFromClient(void *msg, int client_id, int option);
 int sendMsgToClient(void *msg, int size, int client_id);
 void broadcast(void *msg, int size);
 void disconnectClient(int client_id);
+int isValidId(int client_id);
 
 #endif

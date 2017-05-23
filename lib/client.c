@@ -15,7 +15,7 @@ void connectToServer(const char *server_IP){
 	// create a socket for the client
 	network_socket = socket(AF_INET, SOCK_STREAM, 0);
 	if(network_socket == -1){
-		puts("Could not create socket");
+		perror("Could not create socket");
 		exit(EXIT_FAILURE);
 	}
 
@@ -41,11 +41,8 @@ void connectToServer(const char *server_IP){
 		printf("ERROR!! Connection was not succefull\n");
 		exit(EXIT_FAILURE);
 	}
-	if(server_response == SUCCESSFUL_CONNECTION){
-		printf("Connected to server\n");
-	}
-	else{
-		puts("Too many clients connected!");
+	if(server_response == TOO_MANY_CLIENTS){
+		perror("Too many clients connected!");
 		exit(EXIT_FAILURE);
 	}
 
