@@ -8,11 +8,6 @@
 #define LOGIN_MAX_SIZE 13
 #define HIST_MAX_SIZE 200
 
-void clear_buffer(){
-	char aux_ch;
-	while(aux_ch = getch(), aux_ch == ' ' || aux_ch == '\n');
-}
-
 int main(){
 	char ServerIP[30];
 	printf("Please enter the server IP: ");
@@ -34,12 +29,9 @@ int main(){
 	}
 	sendMsgToServer((void *) str_buffer, len + 1); // size includes \0
 
-	// clear_buffer();
-
 	puts("Welcome to the chat example");
 	puts("Just type your messages e talk to your freinds");
 	puts("Press [Enter] to continue");
-	getchar();
 	while(1){
 		//// LER UMA TECLA DIGITADA
 		char ch = getch();

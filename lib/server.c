@@ -41,14 +41,10 @@ int makeSocket(){
     	perror("Server could not bind!");
       	exit (EXIT_FAILURE);
     }
-
-    // As the server doesn't uses threads, we need to make the "read" method not preemptive
-	// So it's making the read and the accept call not to stop the program and return "some defined message" when nothing is buffered
-
   	return sock;
 }
 
-// Set everything nedded for the server
+// Set everything nedded to the server
 void serverInit(int max_clients){
 	if(max_clients <= 0 || max_clients >= MAX_CLIENTS){
 		perror("max_clients is invalid!");
@@ -65,12 +61,19 @@ void serverInit(int max_clients){
 	    perror("listen");
 	    exit(EXIT_FAILURE);
 	}
+	memset(connected_clients, 0, sizeof connected_clients);
 
 	serverReset();
 }
 
 // If needed to clean everything
 void serverReset(){
+	int i;
+	for(i = 0; i < actual_max_clients; ++i){
+		if(isValidId(i)){
+			disconnectClient(i);
+		}
+	}
 	memset(connected_clients, 0, sizeof connected_clients);
 	clients_connected = 0;
 	FD_ZERO (&active_fd_set);
@@ -78,13 +81,6 @@ void serverReset(){
 	FD_SET (server_sock, &server_fd_set);
 }
 
-/*
-If there is a connection pedding, accept it.
-Returns:
-	NO_CONNECTION if there is no connection or failed (too many clients)
-	otherwise returns a id to the new user (this id has to be used when a message is needed to be sent to a specific client)
-	0 <= id < max_clients (no of clients set in "serverInit")
-*/
 int acceptConnection(){
 	struct timeval timeout = {0, SELECT_TIMEOUT};
 	fd_set readfds = server_fd_set;

@@ -78,7 +78,6 @@ int recvMsgFromServer(void* msg, int option){
 			return NO_MESSAGE;
 		}
 	}
-	// either we have to wait, or there is nothing to wait
 	int size;
 	int size_ret, msg_ret;
 	// get message size
