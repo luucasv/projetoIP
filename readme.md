@@ -6,8 +6,9 @@ Para isso, vai ser usada a arquitetura cliente-servidor, e a ferramenta utilizad
 Neste git será disponibilizada uma biblioteca desenvolvida pela equipe de monitores, para facilitar o uso de socket.  
 
 A documentação das duas bibliotecas podem ser encotradas em:
-	- [server](./server-doc.md)
-	- [client](./client-doc.md)
+
+- [server](./server-doc.md)
+- [client](./client-doc.md)
 
 ## O que é?
 
