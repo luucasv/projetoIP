@@ -5,7 +5,9 @@ De maneira geral, o projeto é um jogo que envolve conexão e pessoas em computa
 Para isso, vai ser usada a arquitetura cliente-servidor, e a ferramenta utilizada na conexão é socket.
 Neste git será disponibilizada uma biblioteca desenvolvida pela equipe de monitores, para facilitar o uso de socket.  
 
-Em breve teremos uma melhor explicação sobre as funcionalidades implementadas na biblioteca.
+A documentação das duas bibliotecas podem ser encotradas em:
+	- [server](./server-doc.md)
+	- [client](./client-doc.md)
 
 ## O que é?
 
