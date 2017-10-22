@@ -1,8 +1,6 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-#define MAX_CLIENTS 100
-
 #define MESSAGE_OK 0
 #define NO_CONNECTION -1
 #define NO_MESSAGE -2
@@ -12,8 +10,8 @@
 #define WAIT_FOR_IT 1
 #define DONT_WAIT 2
 
-struct msg_ret_t{
-  int status, client_id, quant_bytes;
+struct msg_ret_t {
+	int status, client_id, size;
 };
 
 void serverInit(int max_clients);
