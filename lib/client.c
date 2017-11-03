@@ -50,17 +50,17 @@ void connectToServer(const char *server_IP) {
 }
 
 int sendMsgToServer(void *msg, int size) {
-	int size_ret = write(network_socket, &size, sizeof(int));
+	ssize_t size_ret = write(network_socket, &size, sizeof(int));
 	if (size_ret < 0) {
 		perror("Failed to send message");
 		exit(EXIT_FAILURE);
 	}
-	int msg_ret = write(network_socket, msg, size);
+	ssize_t msg_ret = write(network_socket, msg, (size_t) size);
 	if (msg_ret < 0) {
 		perror("Failed to send message");
 		exit(EXIT_FAILURE);
 	}
-	return msg_ret;
+	return (int) msg_ret;
 }
 
 int recvMsgFromServer(void *msg, int option) {
@@ -77,12 +77,20 @@ int recvMsgFromServer(void *msg, int option) {
 		}
 	}
 	int size;
-	int size_ret, msg_ret;
+	ssize_t size_ret, msg_ret;
 	// get message size
 	size_ret = read(network_socket, &size, sizeof(int));
+	if (size_ret <= 0) {
+		//TODO(lvcs): Implement server disconnected
+		return -1;
+	}
 	// get message content
-	msg_ret = read(network_socket, msg, size);
-	return msg_ret;
+	msg_ret = read(network_socket, msg, (size_t) size);
+	if (msg_ret <= 0) {
+		//TODO(lvcs): Implement server disconnected
+		return -1;
+	}
+	return (int) msg_ret;
 }
 
 /*
@@ -93,11 +101,11 @@ int recvMsgFromServer(void *msg, int option) {
 char getch() {
 	struct termios oldt, newt;
 	int ch;
-	struct pollfd mypoll = { STDIN_FILENO, POLLIN | POLLPRI };
+	struct pollfd mypoll = { STDIN_FILENO, POLLIN | POLLPRI, 0};
 	tcgetattr(STDIN_FILENO, &oldt);	// saving old config in oldt
 
 	newt = oldt;
-	newt.c_lflag &= ~(ICANON | ECHO);
+	newt.c_lflag &= ~((tcflag_t) (ICANON | ECHO));
 
 	tcsetattr(STDIN_FILENO, TCSANOW, &newt);	// setting new config
 
@@ -108,5 +116,5 @@ char getch() {
 	}
 
 	tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-	return ch;
+	return (char) ch;
 }

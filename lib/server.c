@@ -56,9 +56,10 @@ void serverInit(int max_clients) {
 	}
 
 	actual_max_clients = max_clients;
-	size_t bytes_size = max_clients * sizeof(server_view_client);
+	size_t bytes_size = (size_t) max_clients * sizeof(server_view_client);
 	connected_clients =
 			(server_view_client *) realloc(connected_clients, bytes_size);
+
 	server_sock = makeSocket();
 
 	// make it available for connections
@@ -68,7 +69,6 @@ void serverInit(int max_clients) {
 		perror("listen");
 		exit(EXIT_FAILURE);
 	}
-	memset(connected_clients, 0, sizeof connected_clients);
 
 	serverReset();
 }
@@ -81,7 +81,8 @@ void serverReset() {
 			disconnectClient(i);
 		}
 	}
-	memset(connected_clients, 0, sizeof connected_clients);
+	memset(connected_clients, 0,
+				 (size_t) actual_max_clients * sizeof(server_view_client));
 	clients_connected = 0;
 	FD_ZERO(&active_fd_set);
 	FD_ZERO(&server_fd_set);
@@ -189,7 +190,7 @@ struct msg_ret_t recvMsgFromClient(void *msg, int client_id, int option) {
 	}
 	// either we have to wait, or there is nothing to wait
 	int msg_size;
-	int size_ret, msg_ret;
+	ssize_t size_ret, msg_ret;
 	// get message size
 	size_ret = read(connected_clients[client_id].sockid, &msg_size, sizeof(int));
 	if (size_ret <= 0) {
@@ -197,12 +198,12 @@ struct msg_ret_t recvMsgFromClient(void *msg, int client_id, int option) {
 		return make_msg_ret(DISCONNECT_MSG, client_id, 0);
 	}
 	// get message content
-	msg_ret = read(connected_clients[client_id].sockid, msg, msg_size);
+	msg_ret = read(connected_clients[client_id].sockid, msg, (size_t) msg_size);
 	if (msg_ret <= 0) {
 		disconnectClient(client_id);
 		return make_msg_ret(DISCONNECT_MSG, client_id, 0);
 	}
-	return make_msg_ret(MESSAGE_OK, client_id, msg_ret);
+	return make_msg_ret(MESSAGE_OK, client_id, (int)msg_ret);
 }
 
 /*
@@ -215,17 +216,19 @@ int sendMsgToClient(void *msg, int size, int client_id) {
 	if (!isValidId(client_id)) {
 		return NOT_VALID_CLIENT_ID;
 	}
-	int size_ret = write(connected_clients[client_id].sockid, &size, sizeof(int));
+	ssize_t size_ret =
+			write(connected_clients[client_id].sockid, &size, sizeof(int));
 	if (size_ret < 0) {
 		perror("Failed to send message to client");
 		exit(EXIT_FAILURE);
 	}
-	int msg_ret = write(connected_clients[client_id].sockid, msg, size);
+	ssize_t msg_ret =
+			write(connected_clients[client_id].sockid, msg, (size_t) size);
 	if (msg_ret < 0) {
 		perror("Failed to send message");
 		exit(EXIT_FAILURE);
 	}
-	return msg_ret;
+	return (int)msg_ret;
 }
 
 /*

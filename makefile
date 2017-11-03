@@ -1,22 +1,56 @@
-serverFile=examples/simpleChatServer
-clientFile=examples/simpleChatClient
-serverName=server
-clientName=client
+CC := gcc -std=c99
+RM := rm -f
+MK := mkdir -p
+CFLAGS := -Wall -Werror -Wconversion -Wextra
+LDLIB := -lm
 
-all: compServer compClient
+OUTPUTDIR := bin
+LIBDIR := lib
+CLIENTDIR := examples/client
+SERVERDIR := examples/server
 
-server: compServer runServer
+CLIENTNAME := client
+SERVERNAME := server
 
-client: compClient runClient
+EXT := c
+INC := -I .
 
-compClient:
-	gcc -o $(clientName) $(clientFile).c lib/client.c
+CLIENTSOURCES := $(shell find $(CLIENTDIR) -type f -name *.$(EXT))
+SERVERSOURCES := $(shell find $(SERVERDIR) -type f -name *.$(EXT))
+LIBS := $(shell find $(LIBDIR) -type f -name *.$(EXT))
 
-compServer:
-	gcc -o $(serverName) $(serverFile).c lib/server.c
+CLIENTOBJS := $(subst .$(EXT),.o,$(CLIENTSOURCES))
+SERVEROBJS := $(subst .$(EXT),.o,$(SERVERSOURCES))
+LIBOBJS := $(subst .$(EXT),.o,$(LIBS))
+
+all: mkdirs buildServer buildClient clean
+
+server: mkdirs buildServer clean runServer
+
+client: mkdirs buildClient clean runClient
+
+buildClient: $(LIBOBJS) $(CLIENTOBJS)
+	@echo "\n  Linking $(CLIENTNAME)..."
+	$(CC) -o $(OUTPUTDIR)/$(CLIENTNAME) $(LIBOBJS) $(CLIENTOBJS) $(LDLIB) $(CFLAGS)
+	@echo "\n"
+
+buildServer: $(LIBOBJS) $(SERVEROBJS)
+	@echo "\n  Linking $(SERVERNAME)..."
+	$(CC) -o $(OUTPUTDIR)/$(SERVERNAME) $(LIBOBJS) $(SERVEROBJS) $(LDLIB) $(CFLAGS)
+	@echo "\n"
+
+%.o : %.$(EXT)	
+	$(CC) -c $< -o $@ $(INC) $(CFLAGS)
+
+mkdirs:
+	$(MK) $(OUTPUTDIR)
+
+clean:
+	@echo "  Cleaning..."
+	$(RM) $(LIBOBJS) $(CLIENTOBJS) $(SERVEROBJS)
 
 runClient:
-	./$(clientName)
+	@echo "\n  Strating to run $(CLIENTNAME)...\n"; ./$(OUTPUTDIR)/$(CLIENTNAME)
 
 runServer:
-	./$(serverName)
+	@echo "\n  Strating to run $(SERVERNAME)...\n"; ./$(OUTPUTDIR)/$(SERVERNAME) 

@@ -1,4 +1,4 @@
-#include "../lib/client.h"
+#include "lib/client.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -18,7 +18,7 @@ int main(){
 	printf("Please enter your login (limit = %d): ", LOGIN_MAX_SIZE);
 	getchar();
 	fgets(str_buffer, LOGIN_MAX_SIZE + 1, stdin);
-	int len = strlen(str_buffer) - 1;
+	int len = (int) strlen(str_buffer) - 1;
 	str_buffer[len] = '\0'; // chaging \n to \0
 
 	if(str_buffer[0] == '\0'){

@@ -15,8 +15,11 @@
 
 #define PORT 9005
 
-#define TOO_MANY_CLIENTS 1
-#define SUCCESSFUL_CONNECTION 2
+enum connect_answer {
+	TOO_MANY_CLIENTS,
+	SUCCESSFUL_CONNECTION
+} connect_answer_t;
+
 #define SELECT_TIMEOUT 300
 
 #endif
