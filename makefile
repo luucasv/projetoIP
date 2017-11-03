@@ -6,14 +6,14 @@ LDLIB := -lm
 
 OUTPUTDIR := bin
 LIBDIR := lib
-CLIENTDIR := examples/client
-SERVERDIR := examples/server
+CLIENTDIR := examples/simpleChatClient
+SERVERDIR := examples/simpleChatServer
 
 CLIENTNAME := client
 SERVERNAME := server
 
 EXT := c
-INC := -I .
+INC := -I lib
 
 CLIENTSOURCES := $(shell find $(CLIENTDIR) -type f -name *.$(EXT))
 SERVERSOURCES := $(shell find $(SERVERDIR) -type f -name *.$(EXT))

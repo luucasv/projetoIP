@@ -11,7 +11,7 @@
 #define DONT_WAIT 2
 
 struct msg_ret_t {
-	int status, client_id, size;
+  int status, client_id, size;
 };
 
 void serverInit(int max_clients);
