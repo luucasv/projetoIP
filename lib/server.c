@@ -89,6 +89,31 @@ void serverReset() {
   FD_SET(server_sock, &server_fd_set);
 }
 
+void rejectConnection() {
+  struct timeval timeout = {0, SELECT_TIMEOUT};
+  fd_set readfds = server_fd_set;
+
+  int sel_ret = select(FD_SETSIZE, &readfds, NULL, NULL, &timeout);
+  if (sel_ret < 0) {
+    perror("select");
+    exit(EXIT_FAILURE);
+  }
+  if (sel_ret == 0) {
+    return;
+  }
+
+  int new_sock = accept(server_sock, NULL, NULL);
+  enum conn_msg_t return_msg = CONNECTIONS_CLOSED;
+  int msg_size = sizeof(return_msg);
+
+  if (new_sock < 0) {  // not valid sock value
+    return;
+  }
+  write(new_sock, &msg_size, sizeof(msg_size));
+  write(new_sock, &return_msg, sizeof(return_msg));
+  close(new_sock);
+}
+
 int acceptConnection() {
   struct timeval timeout = {0, SELECT_TIMEOUT};
   fd_set readfds = server_fd_set;
@@ -103,24 +128,28 @@ int acceptConnection() {
   }
 
   int new_sock = accept(server_sock, NULL, NULL);
-  int return_msg;
+  enum conn_msg_t return_msg;
 
   if (new_sock < 0) {  // not valid sock value
     perror("Could not create new socket for new connection");
     exit(EXIT_FAILURE);
   }
-  if (clients_connected ==
-      actual_max_clients) {  // there are too many clients connected
+  if (clients_connected == actual_max_clients) { 
+    // there are too many clients connected
     return_msg = TOO_MANY_CLIENTS;
+    int x = sizeof(return_msg);
+    write(new_sock, &x, sizeof(x));
     write(new_sock, &return_msg, sizeof(return_msg));
     close(new_sock);
   } else {
     ++clients_connected;
     int i;
     return_msg = SUCCESSFUL_CONNECTION;
-    for (i = 0; i < actual_max_clients;
-         ++i) {  // look for available space for this new client
+    // look for available space for this new client
+    for (i = 0; i < actual_max_clients; ++i) { 
       if (connected_clients[i].sockid == 0) {
+        int x = sizeof(return_msg);
+        write(new_sock, &x, sizeof(x));
         write(new_sock, &return_msg, sizeof(return_msg));
         FD_SET(new_sock, &active_fd_set);
         connected_clients[i].sockid = new_sock;
@@ -153,8 +182,8 @@ struct msg_ret_t recvMsg(void *msg) {
     return make_msg_ret(NO_MESSAGE, -1, 0);
   }
   int i;
-  for (i = 0; i < actual_max_clients;
-       ++i) {  // look for someone with valid sockid
+  // look for someone with valid sockid
+  for (i = 0; i < actual_max_clients; ++i) {
     if (isValidId(i)) {
       if (FD_ISSET(connected_clients[i].sockid, &readfds)) {
         return recvMsgFromClient(msg, i, WAIT_FOR_IT);

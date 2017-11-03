@@ -15,10 +15,11 @@
 
 #define PORT 9005
 
-enum connect_answer {
+enum conn_msg_t {
+  SUCCESSFUL_CONNECTION,
   TOO_MANY_CLIENTS,
-  SUCCESSFUL_CONNECTION
-} connect_answer_t;
+  CONNECTIONS_CLOSED
+};
 
 #define SELECT_TIMEOUT 300
 

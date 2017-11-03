@@ -7,12 +7,18 @@
 int network_socket;
 fd_set sock_fd_set;
 
+
+void closeConnection() {
+  shutdown(network_socket, 3);
+  close(network_socket);
+}
+
 /*
-        Connects to server with IP informed as string on standard format
-   (X.X.X.X)
-        If ServerIP is NULL connects to localhost (good to debug)
+  Connects to server with IP informed as string on standard format
+(X.X.X.X)
+  If ServerIP is NULL connects to localhost (good to debug)
 */
-void connectToServer(const char *server_IP) {
+enum conn_ret_t connectToServer(const char *server_IP) {
   // create a socket for the client
   network_socket = socket(AF_INET, SOCK_STREAM, 0);
   if (network_socket == -1) {
@@ -34,33 +40,47 @@ void connectToServer(const char *server_IP) {
   int connection_status =
       connect(network_socket, (struct sockaddr *)&server_address,
               sizeof(server_address));
-  int server_response = SUCCESSFUL_CONNECTION;
+  enum conn_msg_t server_response = SUCCESSFUL_CONNECTION;
+
+  FD_ZERO(&sock_fd_set);
+  FD_SET(network_socket, &sock_fd_set);
+  
   if (connection_status == 0) {
-    read(network_socket, &server_response,
-         sizeof(int));  // reads server_response
+    // read server_response
+    ssize_t conn_ans = recvMsgFromServer(&server_response, DONT_WAIT);
+    if (conn_ans == SERVER_DISCONNECTED) {
+      closeConnection();
+      return SERVER_DOWN;
+    } else if (conn_ans == NO_MESSAGE) {
+      closeConnection();
+      return SERVER_TIMEOUT;
+    }
   } else if (connection_status == -1) {
-    printf("ERROR!! Connection was not succefull\n");
-    exit(EXIT_FAILURE);
+    closeConnection();
+    return SERVER_DOWN;
   }
+
   if (server_response == TOO_MANY_CLIENTS) {
-    perror("Too many clients connected!");
-    exit(EXIT_FAILURE);
+    closeConnection();
+    return SERVER_FULL;
+  } else if (server_response == CONNECTIONS_CLOSED) {
+    closeConnection();
+    return SERVER_CLOSED;
   }
 
   FD_ZERO(&sock_fd_set);
   FD_SET(network_socket, &sock_fd_set);
+  return SERVER_UP;
 }
 
 int sendMsgToServer(void *msg, int size) {
-  ssize_t size_ret = write(network_socket, &size, sizeof(int));
-  if (size_ret < 0) {
-    perror("Failed to send message");
-    exit(EXIT_FAILURE);
+  ssize_t size_ret = send(network_socket, &size, sizeof(int), MSG_NOSIGNAL);
+  if (size_ret <= 0) {
+    return SERVER_DISCONNECTED;
   }
-  ssize_t msg_ret = write(network_socket, msg, (size_t)size);
-  if (msg_ret < 0) {
-    perror("Failed to send message");
-    exit(EXIT_FAILURE);
+  ssize_t msg_ret = send(network_socket, msg, (size_t)size, MSG_NOSIGNAL);
+  if (msg_ret <= 0) {
+    return SERVER_DISCONNECTED;
   }
   return (int)msg_ret;
 }
@@ -83,21 +103,19 @@ int recvMsgFromServer(void *msg, int option) {
   // get message size
   size_ret = read(network_socket, &size, sizeof(int));
   if (size_ret <= 0) {
-    // TODO(lvcs): Implement server disconnected
-    return -1;
+    return SERVER_DISCONNECTED;
   }
   // get message content
   msg_ret = read(network_socket, msg, (size_t)size);
   if (msg_ret <= 0) {
-    // TODO(lvcs): Implement server disconnected
-    return -1;
+    return SERVER_DISCONNECTED;
   }
   return (int)msg_ret;
 }
 
 /*
-        modified getch();
-        waits GETCH_TIMEOUT ms for key to be pressed, if it is not, returns
+    modified getch();
+    waits GETCH_TIMEOUT ms for key to be pressed, if it is not, returns
    NO_KEY_PRESSED
 */
 

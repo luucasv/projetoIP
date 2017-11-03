@@ -30,6 +30,12 @@ Busca por uma conexão nova, caso tenha alguma pendente.
 -  Caso haja alguma conexão pendente a função retorna o id que foi dado para o cliente. **O id é um número entre [0, *max_clients*) (onde *max_clients* dado como argumento de serverInit**).  
 -  Caso não exista conexões pendentes o retorno da função é *NO_CONNECTION* (definido em *server.h*)
 
+```c
+void rejectConnection();
+``` 
+Rejeita uma conexão nova, caso tenha alguma pendente.
+É util para informar aos clientes que o servidor não está aberto a conexões.
+
 ## Recebendo mensagens dos clientes
 ### Recebendo mensagens sem especificar o cliente
 ```c

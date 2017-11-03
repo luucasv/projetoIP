@@ -21,18 +21,26 @@ int main() {
   int len = (int)strlen(str_buffer) - 1;
   str_buffer[len] = '\0';  // chaging \n to \0
 
+  enum conn_ret_t ans;
   if (str_buffer[0] == '\0') {
-    connectToServer(NULL);
+    ans = connectToServer(NULL);
   } else {
-    connectToServer(ServerIP);
+    ans = connectToServer(ServerIP);
   }
+
+  if (ans != SERVER_UP) {
+    puts("server not up!!!");
+    exit(EXIT_FAILURE);
+  }
+
   sendMsgToServer((void *)str_buffer, len + 1);  // size includes \0
 
   puts("Welcome to the chat example");
   puts("Just type your messages e talk to your freinds");
   puts("Press [Enter] to continue");
+  getchar();
   while (1) {
-    //// LER UMA TECLA DIGITADA
+    // LER UMA TECLA DIGITADA
     char ch = getch();
     if (ch == '\n') {
       type_buffer[type_pointer++] = '\0';
@@ -49,7 +57,7 @@ int main() {
       type_buffer[type_pointer] = '\0';
     }
 
-    //// LER UMA MENSAGEM DO SERVIDOR
+    // LER UMA MENSAGEM DO SERVIDOR
     int ret = recvMsgFromServer(str_buffer, DONT_WAIT);
     if (ret != NO_MESSAGE) {
       int i;
@@ -59,7 +67,7 @@ int main() {
       strcpy(msg_history[HIST_MAX_SIZE - 1], str_buffer);
     }
 
-    //// PRINT NEW CHAT STATE
+    // PRINTAR NOVO ESTADO DO CHAT
     system("clear");
     int i;
     for (i = 0; i < HIST_MAX_SIZE; ++i) {
