@@ -33,4 +33,4 @@ Idealmente alguns exemplos de uso da biblioteca serão colocados na pasta de exe
 
 
 ## Agradecimentos:
-Esta é uma modificação de 2016.2, onde [Lucas Santana](https://github.com/luucasv/), [Matues Valgueiro](https://github.com/Valgueiro), [Vitor Castelo Branco](https://github.com/vtcb) e [Erik Zambom](https://github.com/Zambom) foram contribuidores.
+Esta é uma modificação de 2016.2, onde [Lucas Santana](https://github.com/luucasv/), [Mateus Valgueiro](https://github.com/Valgueiro), [Vitor Castelo Branco](https://github.com/vtcb) e [Erik Zambom](https://github.com/Zambom) foram contribuidores.

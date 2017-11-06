@@ -8,6 +8,7 @@ OUTPUTDIR := bin
 LIBDIR := lib
 CLIENTDIR := examples/simpleChatClient
 SERVERDIR := examples/simpleChatServer
+COMMONDIR := none
 
 CLIENTNAME := client
 SERVERNAME := server
@@ -17,11 +18,14 @@ INC := -I lib
 
 CLIENTSOURCES := $(shell find $(CLIENTDIR) -type f -name *.$(EXT))
 SERVERSOURCES := $(shell find $(SERVERDIR) -type f -name *.$(EXT))
-LIBS := $(shell find $(LIBDIR) -type f -name *.$(EXT))
+LIBSOURCES := $(shell find $(LIBDIR) -type f -name *.$(EXT))
+COMMONSOURCES := $(shell find $(COMMONDIR) -type f -name *.$(EXT))
+
 
 CLIENTOBJS := $(subst .$(EXT),.o,$(CLIENTSOURCES))
 SERVEROBJS := $(subst .$(EXT),.o,$(SERVERSOURCES))
-LIBOBJS := $(subst .$(EXT),.o,$(LIBS))
+LIBOBJS := $(subst .$(EXT),.o,$(LIBSOURCES))
+COMMONOBJS := $(subst .$(EXT),.o,$(COMMONSOURCES))
 
 all: mkdirs buildServer buildClient clean
 
@@ -29,12 +33,12 @@ server: mkdirs buildServer clean runServer
 
 client: mkdirs buildClient clean runClient
 
-buildClient: $(LIBOBJS) $(CLIENTOBJS)
+buildClient: $(LIBOBJS) $(CLIENTOBJS) $(COMMONOBJS)
 	@echo "\n  Linking $(CLIENTNAME)..."
 	$(CC) -o $(OUTPUTDIR)/$(CLIENTNAME) $(LIBOBJS) $(CLIENTOBJS) $(LDLIB) $(CFLAGS)
 	@echo "\n"
 
-buildServer: $(LIBOBJS) $(SERVEROBJS)
+buildServer: $(LIBOBJS) $(SERVEROBJS)$(COMMONOBJS)
 	@echo "\n  Linking $(SERVERNAME)..."
 	$(CC) -o $(OUTPUTDIR)/$(SERVERNAME) $(LIBOBJS) $(SERVEROBJS) $(LDLIB) $(CFLAGS)
 	@echo "\n"

@@ -35,6 +35,11 @@ void rejectConnection();
 ``` 
 Rejeita uma conexão nova, caso tenha alguma pendente.
 É util para informar aos clientes que o servidor não está aberto a conexões.
+Esta chamada causa um SERVER_CLOSED como resposta do client ao tentar conectar ao server.
+
+### **OBS:** 
+
+- É importante fazer uso destas funções, mesmo que para rejeitar uma conexão. Pois assim o cliente vai saber como anda o estado atual do servidor, e não receber simplesmente um TIMEOUT.
 
 ## Recebendo mensagens dos clientes
 ### Recebendo mensagens sem especificar o cliente

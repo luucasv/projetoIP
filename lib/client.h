@@ -1,5 +1,5 @@
-#ifndef CLIENT_H
-#define CLIENT_H
+#ifndef LIB_CLIENT_H_
+#define LIB_CLIENT_H_
 
 #define NO_KEY_PRESSED '\0'
 
@@ -22,4 +22,4 @@ int sendMsgToServer(void *msg, int size);
 int recvMsgFromServer(void *msg, int option);
 char getch();
 
-#endif
+#endif  // LIB_CLIENT_H_

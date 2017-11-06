@@ -225,20 +225,25 @@ struct msg_ret_t recvMsgFromClient(void *msg, int client_id, int option) {
   }
   // either we have to wait, or there is nothing to wait
   int msg_size;
-  ssize_t size_ret, msg_ret;
   // get message size
-  size_ret = read(connected_clients[client_id].sockid, &msg_size, sizeof(int));
+  ssize_t size_ret = read(connected_clients[client_id].sockid, &msg_size, 
+                          sizeof(int));
   if (size_ret <= 0) {
     disconnectClient(client_id);
     return make_msg_ret(DISCONNECT_MSG, client_id, 0);
   }
   // get message content
-  msg_ret = read(connected_clients[client_id].sockid, msg, (size_t)msg_size);
-  if (msg_ret <= 0) {
-    disconnectClient(client_id);
-    return make_msg_ret(DISCONNECT_MSG, client_id, 0);
+  ssize_t total_size = 0;
+  while (total_size < msg_size) {
+    ssize_t msg_ret = read(connected_clients[client_id].sockid,
+                           msg + total_size, (size_t)msg_size);
+    if (msg_ret <= 0) {
+      disconnectClient(client_id);
+      return make_msg_ret(DISCONNECT_MSG, client_id, 0);
+    }
+    total_size += msg_ret;
   }
-  return make_msg_ret(MESSAGE_OK, client_id, (int)msg_ret);
+  return make_msg_ret(MESSAGE_OK, client_id, (int)total_size);
 }
 
 /*
@@ -251,19 +256,21 @@ int sendMsgToClient(void *msg, int size, int client_id) {
   if (!isValidId(client_id)) {
     return NOT_VALID_CLIENT_ID;
   }
-  ssize_t size_ret =
-      write(connected_clients[client_id].sockid, &size, sizeof(int));
-  if (size_ret < 0) {
-    perror("Failed to send message to client");
-    exit(EXIT_FAILURE);
+  ssize_t size_ret = send(connected_clients[client_id].sockid, &size,
+                          sizeof(int), MSG_NOSIGNAL);
+  if (size_ret <= 0) {
+    return CLIENT_DISCONNECTED;
   }
-  ssize_t msg_ret =
-      write(connected_clients[client_id].sockid, msg, (size_t)size);
-  if (msg_ret < 0) {
-    perror("Failed to send message");
-    exit(EXIT_FAILURE);
+  ssize_t total_size = 0;
+  while (total_size < (ssize_t) size) {
+    ssize_t msg_ret = send(connected_clients[client_id].sockid,
+                           msg + total_size, (size_t)size, MSG_NOSIGNAL);
+    if (msg_ret <= 0) {
+      return CLIENT_DISCONNECTED;
+    }
+    total_size += msg_ret;
   }
-  return (int)msg_ret;
+  return (int)total_size;
 }
 
 /*

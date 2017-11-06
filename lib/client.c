@@ -4,6 +4,7 @@
 #include "default.h"
 
 #define GETCH_TIMEOUT 100
+#define READ_CONN_TIMEOUT 6
 int network_socket;
 fd_set sock_fd_set;
 
@@ -48,6 +49,12 @@ enum conn_ret_t connectToServer(const char *server_IP) {
   if (connection_status == 0) {
     // read server_response
     ssize_t conn_ans = recvMsgFromServer(&server_response, DONT_WAIT);
+    unsigned int i = 0;
+    while (i < READ_CONN_TIMEOUT && conn_ans == NO_MESSAGE) {
+      i++;
+      sleep(i);
+      conn_ans = recvMsgFromServer(&server_response, DONT_WAIT);
+    }
     if (conn_ans == SERVER_DISCONNECTED) {
       closeConnection();
       return SERVER_DOWN;
@@ -78,11 +85,16 @@ int sendMsgToServer(void *msg, int size) {
   if (size_ret <= 0) {
     return SERVER_DISCONNECTED;
   }
-  ssize_t msg_ret = send(network_socket, msg, (size_t)size, MSG_NOSIGNAL);
-  if (msg_ret <= 0) {
-    return SERVER_DISCONNECTED;
+  ssize_t total_size = 0;
+  while (total_size < (ssize_t) size) {
+    ssize_t msg_ret =
+        send(network_socket, msg + total_size, (size_t)size, MSG_NOSIGNAL);
+    if (msg_ret <= 0) {
+      return SERVER_DISCONNECTED;
+    }
+    total_size += msg_ret;
   }
-  return (int)msg_ret;
+  return (int)total_size;
 }
 
 int recvMsgFromServer(void *msg, int option) {
@@ -99,18 +111,21 @@ int recvMsgFromServer(void *msg, int option) {
     }
   }
   int size;
-  ssize_t size_ret, msg_ret;
   // get message size
-  size_ret = read(network_socket, &size, sizeof(int));
+  ssize_t size_ret = read(network_socket, &size, sizeof(int));
   if (size_ret <= 0) {
     return SERVER_DISCONNECTED;
   }
   // get message content
-  msg_ret = read(network_socket, msg, (size_t)size);
-  if (msg_ret <= 0) {
-    return SERVER_DISCONNECTED;
+  ssize_t total_size = 0;
+  while (total_size < (ssize_t) size) {
+    ssize_t msg_ret = read(network_socket, msg + total_size, (size_t)size);
+    if (msg_ret <= 0) {
+      return SERVER_DISCONNECTED;
+    }
+    total_size += msg_ret;
   }
-  return (int)msg_ret;
+  return (int)total_size ;
 }
 
 /*

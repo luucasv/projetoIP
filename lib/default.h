@@ -1,5 +1,5 @@
-#ifndef DEFAULT_H
-#define DEFAULT_H
+#ifndef LIB_DEFAULT_H_
+#define LIB_DEFAULT_H_
 
 #include <arpa/inet.h>
 #include <errno.h>
@@ -23,4 +23,4 @@ enum conn_msg_t {
 
 #define SELECT_TIMEOUT 300
 
-#endif
+#endif  // LIB_DEFAULT_H_
