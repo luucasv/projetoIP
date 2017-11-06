@@ -76,7 +76,7 @@ void runChat() {
       }
     } else if (ch != NO_KEY_PRESSED && type_pointer + 1 < MSG_MAX_SIZE) {
       type_buffer[type_pointer++] = ch;
-      type_buffer[type_pointer] = '\0';  printf("%d\n", foo());
+      type_buffer[type_pointer] = '\0';
       
     }
 
