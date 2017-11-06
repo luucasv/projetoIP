@@ -16,16 +16,16 @@ Com esta função nos conectamos ao servidor com IP dado por server_IP. Para os 
 	- *SERVER_UP*, se conexão foi estabelecida
 	- *SERVER_DOWN*, se não foi possivel encontrar o servidor
 	- *SERVER_FULL*, se o server está cheio (atingiu o número máximo de clientes)
-  - *SERVER_CLOSED*, se o server está fechado para connexões
-  - *SERVER_TIMEOUT*, se o server demorou para dar uma resposta sobre o status da conexão
+    - *SERVER_CLOSED*, se o server está fechado para conexões
+    - *SERVER_TIMEOUT*, se o server demorou para dar uma resposta sobre o status da conexão
 ##### **OBS:** 
-	- O único retorno em que o programa deve seguir o fluxo normalmente é SERVER_UP.
+- O único retorno em que o programa deve seguir o fluxo normalmente é SERVER_UP.
 
 ## Enviando mensagens para o servidor
 ```c
 int sendMsgToServer(void *msg, int size);
 ```
-Envia a mensagem que está no endereço dado em **msg** o servidor.
+Envia a mensagem que está no endereço dado em **msg** ao servidor.
 ##### **Parâmetros:**
 -	**msg**: Ponteiro para a mensagem que será enviada para o servidor.
 -	**size**:   Tamanho da mensagem em bytes

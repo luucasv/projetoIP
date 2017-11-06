@@ -80,7 +80,7 @@ Busca por uma mensagem que ainda não foi lida e foi enviada pelo cliente com id
 
 - **msg**: Um ponteiro para o local na memória onde desejamos salvar a mensagem que vai ser recebida.
 - **client\_id**: Diferente da função anterior (*recvMsg*), esta função recebe as mensagens de um cliente específico, dado por **client\_id**.
-- **option**: Deve ser uma das duas contantes:
+- **option**: Deve ser uma das duas constantes:
 	- *DONT\_WAIT* e *WAIT\_FOR\_IT*
 	- Como o nome sugere, quando utilizamos a primeira estamos indicando que não queremos esperar a mensagem ser recebida, já na segunda o programa só retorna quando uma mensagem for recebida pelo servidor do cliente identificado pelo **client_id**
 

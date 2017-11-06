@@ -1,3 +1,7 @@
+CLIENTDIR := examples/simpleChat/client
+SERVERDIR := examples/simpleChat/server
+COMMONDIR := examples/simpleChat/common
+
 CC := gcc -std=c99
 RM := rm -f
 MK := mkdir -p
@@ -6,15 +10,12 @@ LDLIB := -lm
 
 OUTPUTDIR := bin
 LIBDIR := lib
-CLIENTDIR := examples/simpleChatClient
-SERVERDIR := examples/simpleChatServer
-COMMONDIR := none
 
 CLIENTNAME := client
 SERVERNAME := server
 
 EXT := c
-INC := -I lib
+INC := -I lib -I $(COMMONDIR)
 
 CLIENTSOURCES := $(shell find $(CLIENTDIR) -type f -name *.$(EXT))
 SERVERSOURCES := $(shell find $(SERVERDIR) -type f -name *.$(EXT))
@@ -35,12 +36,12 @@ client: mkdirs buildClient clean runClient
 
 buildClient: $(LIBOBJS) $(CLIENTOBJS) $(COMMONOBJS)
 	@echo "\n  Linking $(CLIENTNAME)..."
-	$(CC) -o $(OUTPUTDIR)/$(CLIENTNAME) $(LIBOBJS) $(CLIENTOBJS) $(LDLIB) $(CFLAGS)
+	$(CC) -o $(OUTPUTDIR)/$(CLIENTNAME) $(LIBOBJS) $(COMMONOBJS) $(CLIENTOBJS) $(LDLIB) $(CFLAGS)
 	@echo "\n"
 
-buildServer: $(LIBOBJS) $(SERVEROBJS)$(COMMONOBJS)
+buildServer: $(LIBOBJS) $(SERVEROBJS) $(COMMONOBJS)
 	@echo "\n  Linking $(SERVERNAME)..."
-	$(CC) -o $(OUTPUTDIR)/$(SERVERNAME) $(LIBOBJS) $(SERVEROBJS) $(LDLIB) $(CFLAGS)
+	$(CC) -o $(OUTPUTDIR)/$(SERVERNAME) $(LIBOBJS) $(COMMONOBJS) $(SERVEROBJS) $(LDLIB) $(CFLAGS)
 	@echo "\n"
 
 %.o : %.$(EXT)	
@@ -51,7 +52,7 @@ mkdirs:
 
 clean:
 	@echo "  Cleaning..."
-	$(RM) $(LIBOBJS) $(CLIENTOBJS) $(SERVEROBJS)
+	$(RM) $(LIBOBJS) $(CLIENTOBJS) $(SERVEROBJS) $(COMMONOBJS)
 
 runClient:
 	@echo "\n  Strating to run $(CLIENTNAME)...\n"; ./$(OUTPUTDIR)/$(CLIENTNAME)
