@@ -1,12 +1,19 @@
+#UNCOMMENT THESE TO COMPILE SIMPLE CHAT
 CLIENTDIR := examples/simpleChat/client
 SERVERDIR := examples/simpleChat/server
 COMMONDIR := examples/simpleChat/common
 
+#UNCOMMENT THESE TO COMPILE GRAPHIC CHAT
+#CLIENTDIR := examples/graphicChat/client
+#SERVERDIR := examples/graphicChat/server
+#COMMONDIR := examples/graphicChat/common
+
 CC := gcc -std=c99
 RM := rm -f
 MK := mkdir -p
-CFLAGS := -Wall -Werror -Wconversion -Wextra
-LDLIB := -lm
+#Uncomment above for intense debugging
+#CFLAGS := -Wall -Werror -Wconversion -Wextra
+LDLIB := -lm -lallegro -lallegro_image -lallegro_primitives -lallegro_font -lallegro_ttf
 
 OUTPUTDIR := bin
 LIBDIR := lib
