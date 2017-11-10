@@ -1,6 +1,15 @@
 #include "ACore.h"
 
 
+/*
+INITIALIZATION OF BASIC CORE MODULES:
+--ALLEGRO
+--ALLEGRO IMAGE
+--ALLEGRO FONTS
+--ALLEGRO TTF FONT SUPPORT
+--ALLEGRO PRIMITIVES
+--EVENT QUEUE
+*/
 bool coreInit()
 {
     //modules and add-ons initialization
@@ -34,7 +43,6 @@ bool coreInit()
         return false;
     }
 
-
     eventsQueue = al_create_event_queue();
     if (!eventsQueue)
     {
@@ -47,6 +55,8 @@ bool coreInit()
     return true;
 }
 
+
+//FOR INITIALIZING A WINDOW OF WxH SIZE WITH TEXT "title[]"
 bool windowInit(int W, int H, char title[])
 {
     //window and event queue creation
@@ -64,6 +74,8 @@ bool windowInit(int W, int H, char title[])
     return true;
 }
 
+
+//FOR INITIALIZING MAIN EXTERNAL INPUTS (KEYBOARD, MOUSE AND CURSOR)
 bool inputInit()
 {
 	/*------------------------------MOUSE--------------------------------*/
@@ -84,14 +96,14 @@ bool inputInit()
     }
     /*------------------------------MOUSE--------------------------------*/
 
-    /*------------------------------TECLADO------------------------------*/
+    /*------------------------------KEYBOARD------------------------------*/
     if (!al_install_keyboard())
     {
         fprintf(stderr, "Falha ao inicializar o teclado.\n");
         return false;
     }
 
-    /*------------------------------TECLADO------------------------------*/
+    /*------------------------------KEYBOARD------------------------------*/
 
 
     //Registra mouse e teclado na fila de eventos
@@ -101,72 +113,8 @@ bool inputInit()
     return true;
 }
 
-bool fontInit()
-{
-    /*------------------------------FONTE--------------------------------*/
-    start = al_load_font("examples/graphicChat/Resources/Fonts/pressStart.ttf", 16, 0);
-    if (!start)
-    {
-        fprintf(stderr, "Falha ao carregar \"examples/graphicChat/Resources/Fonts/pressStart.ttf\".\n");
-        return false;
-    }
 
-    ubuntu = al_load_font("examples/graphicChat/Resources/Fonts/Ubuntu-R.ttf", 32, 0);
-    if (!ubuntu)
-    {
-        fprintf(stderr, "Falha ao carregar \"Ubuntu-R.ttf\".\n");
-        return false;
-    }
-
-    return true;
-}
-
-void allegroEnd()
-{
-    al_destroy_display(main_window);
-    al_destroy_event_queue(eventsQueue);
-}
-
-
-
-void startTimer()
-{
-    startingTime = al_get_time();
-}
-
-double getTimer()
-{
-    return al_get_time() - startingTime;
-}
-
-void FPSLimit()
-{
-	if (getTimer() < 1.0/FPS)
-    {
-        al_rest((1.0 / FPS) - getTimer());
-    }
-}
-
-
-bool loadGraphics()
-{
-    menuScreen = al_load_bitmap("examples/graphicChat/Resources/Etc/titleScreen2.png");
-    if (!menuScreen)
-    {
-        fprintf(stderr, "Falha carregando menuScreen\n");
-        return false;
-    }
-
-    objects = al_load_bitmap("examples/graphicChat/Resources/Tilesets/objects.png");
-    if (!objects){
-        fprintf(stderr, "Falha carregando objects.png\n");
-        return false;
-    }
-
-    return true;
-}
-
-
+//FOR READING KEYBOARD INPUT WITH MAX SIZE = LIMIT AND SAVING AT STR[]
 void readInput(ALLEGRO_EVENT event, char str[], int limit)
 {
     if (event.type == ALLEGRO_EVENT_KEY_CHAR)
@@ -203,3 +151,71 @@ void readInput(ALLEGRO_EVENT event, char str[], int limit)
 }
 
 
+//FPS CONTROL (FPS IS DEFINED IN ACORE.H)
+void startTimer()
+{
+    startingTime = al_get_time();
+}
+
+double getTimer()
+{
+    return al_get_time() - startingTime;
+}
+
+void FPSLimit()
+{
+    if (getTimer() < 1.0/FPS)
+    {
+        al_rest((1.0 / FPS) - getTimer());
+    }
+}
+
+
+//FOR DEALLOCATING ALL ALLEGRO STUFF
+void allegroEnd()
+{
+    al_destroy_display(main_window);
+    al_destroy_event_queue(eventsQueue);
+}
+
+
+//MODIFY THIS TO LOAD YOUR OWN FONTS (FONT POINTERS ARE DEFINED AT ACORE.H)
+bool fontInit()
+{
+    /*------------------------------FONTE--------------------------------*/
+    start = al_load_font("examples/graphicChat/Resources/Fonts/pressStart.ttf", 16, 0);
+    if (!start)
+    {
+        fprintf(stderr, "Falha ao carregar \"examples/graphicChat/Resources/Fonts/pressStart.ttf\".\n");
+        return false;
+    }
+
+    ubuntu = al_load_font("examples/graphicChat/Resources/Fonts/Ubuntu-R.ttf", 32, 0);
+    if (!ubuntu)
+    {
+        fprintf(stderr, "Falha ao carregar \"Ubuntu-R.ttf\".\n");
+        return false;
+    }
+
+    return true;
+}
+
+
+//MODIFY THIS TO LOAD YOUR OWN GRAPHICS (BITMAP POINTERS ARE DEFINED AT ACORE.H)
+bool loadGraphics()
+{
+    menuScreen = al_load_bitmap("examples/graphicChat/Resources/Etc/titleScreen2.png");
+    if (!menuScreen)
+    {
+        fprintf(stderr, "Falha carregando menuScreen\n");
+        return false;
+    }
+
+    objects = al_load_bitmap("examples/graphicChat/Resources/Tilesets/objects.png");
+    if (!objects){
+        fprintf(stderr, "Falha carregando objects.png\n");
+        return false;
+    }
+
+    return true;
+}

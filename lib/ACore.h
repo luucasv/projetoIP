@@ -19,17 +19,20 @@
 
 double startingTime;
 
-
 ALLEGRO_DISPLAY *main_window;
 ALLEGRO_EVENT_QUEUE *eventsQueue;
 
+//========================
+//FONT AND BITMAP POINTERS
 ALLEGRO_FONT *ubuntu;
 ALLEGRO_FONT *start;
 
 ALLEGRO_BITMAP *objects;
 ALLEGRO_BITMAP *menuScreen;
+//========================
+//========================
 
-
+//EXAMPLE STRUCT
 typedef struct DADOS
 {
     char mensagem[100];
@@ -37,21 +40,22 @@ typedef struct DADOS
 }DADOS;
 
 
-//Funções Centrais da Allegro
+//MAIN ALLEGRO FUNCTIONS
 bool coreInit();
 bool windowInit(int W, int H, char title[]);
 bool inputInit();
-bool fontInit();
 void allegroEnd();
 
-//Funções para Controle da quantidade de Frames por Segundo
+//FPS CONTROL FUNCTIONS
 void startTimer();
 double getTimer();
 void FPSLimit();
 
-//Função de Carregamento de Gráficos
+//RESOURCE LOADING FUNCTIONS
 bool loadGraphics();
+bool fontInit();
 
+//INPUT READING FUNCTION
 void readInput(ALLEGRO_EVENT event, char str[], int limit);
 
 

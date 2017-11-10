@@ -62,7 +62,7 @@ clean:
 	$(RM) $(LIBOBJS) $(CLIENTOBJS) $(SERVEROBJS) $(COMMONOBJS)
 
 runClient:
-	@echo "\n  Strating to run $(CLIENTNAME)...\n"; ./$(OUTPUTDIR)/$(CLIENTNAME)
+	@echo "\n  Starting to run $(CLIENTNAME)...\n"; ./$(OUTPUTDIR)/$(CLIENTNAME)
 
 runServer:
-	@echo "\n  Strating to run $(SERVERNAME)...\n"; ./$(OUTPUTDIR)/$(SERVERNAME) 
+	@echo "\n  Starting to run $(SERVERNAME)...\n"; ./$(OUTPUTDIR)/$(SERVERNAME) 
