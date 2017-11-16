@@ -18,7 +18,7 @@ enum conn_ret_t tryConnect() {
 }
 
 void printHello() {
-  puts("Hello! Wellcome to simple chat example.");
+  puts("Hello! Welcome to simple chat example.");
   puts("We need some infos to start up!");
 }
 
@@ -106,12 +106,12 @@ int main() {
   assertConnection();
 
   puts("Welcome to the chat example");
-  puts("Just type your messages e talk to your freinds");
+  puts("Just type your messages e talk to your friends");
   puts("Press [Enter] to continue");
   getchar();
   while(1) {
     runChat();
-    printf("Server disconnected! Want to try again? [Y/n] ");
+    printf("Server disconnected! Want to try again? [Y/N] ");
     int res;
     while (res = tolower(getchar()), res != 'n' && res != 'y' && res != '\n'){
       puts("anh???");
