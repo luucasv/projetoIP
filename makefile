@@ -1,28 +1,36 @@
-#UNCOMMENT THESE TO COMPILE SIMPLE CHAT
+# client code directory name
 CLIENTDIR := examples/simpleChat/client
+
+# server code directory name
 SERVERDIR := examples/simpleChat/server
+
+# common code directory name
 COMMONDIR := examples/simpleChat/common
 
-#UNCOMMENT THESE TO COMPILE GRAPHIC CHAT
-#CLIENTDIR := examples/graphicChat/client
-#SERVERDIR := examples/graphicChat/server
-#COMMONDIR := examples/graphicChat/common
+# binary output directory name
+OUTPUTDIR := bin
+
+# name for the output(binary) of the client code
+CLIENTNAME := client
+
+# name for the output(binary) of the server code
+SERVERNAME := server
+
+# libary code directory name
+LIBDIR := lib
+
+# add C flags, like: CFLAGS := -Wall -Werror -Wconversion -Wextra
+CFLAGS :=
+
+# add load flags, others like -pthread
+LDLIB := -lm -lallegro -lallegro_image -lallegro_primitives -lallegro_font -lallegro_ttf
 
 CC := gcc -std=c99
 RM := rm -f
 MK := mkdir -p
-#Uncomment above for intense debugging
-#CFLAGS := -Wall -Werror -Wconversion -Wextra
-LDLIB := -lm -lallegro -lallegro_image -lallegro_primitives -lallegro_font -lallegro_ttf
-
-OUTPUTDIR := bin
-LIBDIR := lib
-
-CLIENTNAME := client
-SERVERNAME := server
 
 EXT := c
-INC := -I lib -I $(COMMONDIR)
+INC := -I $(LIBDIR) -I $(COMMONDIR)
 
 CLIENTSOURCES := $(shell find $(CLIENTDIR) -type f -name *.$(EXT))
 SERVERSOURCES := $(shell find $(SERVERDIR) -type f -name *.$(EXT))
