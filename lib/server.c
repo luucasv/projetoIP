@@ -60,6 +60,8 @@ void serverInit(int max_clients) {
   connected_clients =
       (server_view_client *)realloc(connected_clients, bytes_size);
 
+  memset(connected_clients, 0, bytes_size));
+         
   server_sock = makeSocket();
 
   // make it available for connections
